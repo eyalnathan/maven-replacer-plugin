@@ -1,16 +1,18 @@
 package com.google.code.maven_replacer_plugin;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-
+import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 public class ReplacerFactory {
-	public Replacer create(Replacement replacement) {
-		TokenReplacer tokenReplacer = new TokenReplacer();
-		
-		if (isNotEmpty(replacement.getXpath())) {
-			return new XPathReplacer(tokenReplacer);
-		}
-		return tokenReplacer;
+	private final FileUtils fileUtils;
+	private final TokenReplacer tokenReplacer;
+
+	public ReplacerFactory(FileUtils fileUtils, TokenReplacer tokenReplacer) {
+		this.fileUtils = fileUtils;
+		this.tokenReplacer = tokenReplacer;
+	}
+
+	public Replacer create() {
+		return new Replacer(fileUtils, tokenReplacer);
 	}
 
 }

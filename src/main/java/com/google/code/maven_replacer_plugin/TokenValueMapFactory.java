@@ -22,47 +22,46 @@ public class TokenValueMapFactory {
 		this.fileUtils = fileUtils;
 	}
 	
-	public List<Replacement> replacementsForVariable(String variable, boolean commentsEnabled, boolean unescape, String encoding) {
+	public List<Replacement> contextsForVariable(String variable, boolean commentsEnabled, boolean unescape) {
 		StringTokenizer tokenizer = new StringTokenizer(variable, ",");
 		String fragment = null;
-		List<Replacement> replacements = new ArrayList<Replacement>();
+		List<Replacement> contexts = new ArrayList<Replacement>();
 		while (tokenizer.hasMoreTokens()) {
 			fragment = tokenizer.nextToken();
 			if (ignoreFragment(fragment, commentsEnabled)) {
 				continue;
 			}
 
-			appendReplacement(replacements, fragment, unescape, encoding);
+			appendContext(contexts, fragment, unescape);
 		}
-		return replacements;
+		return contexts;
 	}
 
-	public List<Replacement> replacementsForFile(String tokenValueMapFile, boolean commentsEnabled, 
-			boolean unescape, String encoding) 
+	public List<Replacement> contextsForFile(String tokenValueMapFile, boolean commentsEnabled, boolean unescape) 
 		throws IOException {
-		String contents = fileUtils.readFile(tokenValueMapFile, encoding);
+		String contents = fileUtils.readFile(tokenValueMapFile);
 		BufferedReader reader = new BufferedReader(new StringReader(contents));
 
 		String fragment = null;
-		List<Replacement> replacements = new ArrayList<Replacement>();
+		List<Replacement> contexts = new ArrayList<Replacement>();
 		while ((fragment = reader.readLine()) != null) {
 			fragment = fragment.trim();
 			if (ignoreFragment(fragment, commentsEnabled)) {
 				continue;
 			}
 
-			appendReplacement(replacements, fragment, unescape, encoding);
+			appendContext(contexts, fragment, unescape);
 		}
-		return replacements;
+		return contexts;
 	}
 	
-	private void appendReplacement(List<Replacement> replacements, String fragment, boolean unescape, String encoding) {
+	private void appendContext(List<Replacement> contexts, String fragment, boolean unescape) {
 		StringBuilder token = new StringBuilder();
 		String value = "";
 		boolean settingToken = true;
 		for (int i=0; i < fragment.length(); i++) {
 			if (i == 0 && fragment.charAt(0) == SEPARATOR) {
-				throw new IllegalArgumentException(getNoValueErrorMsgFor(fragment));
+				throw new IllegalArgumentException(getNoValueErrorMsgFor(fragment) + "1");
 			}
 
 			if (settingToken && !isSeparatorAt(i, fragment)) {
@@ -76,12 +75,12 @@ public class TokenValueMapFactory {
 			}
 		}
 
-		if (settingToken) {
+		String tokenVal = token.toString().trim();
+		if (tokenVal.length() == 0 || settingToken) {
 			return;
 		}
-		
-		String tokenVal = token.toString().trim();
-		replacements.add(new Replacement(fileUtils, tokenVal, value.trim(), unescape, null, encoding));
+		value = value.trim();
+		contexts.add(new Replacement(fileUtils, tokenVal, value, unescape));
 	}
 
 	private boolean isSeparatorAt(int i, String line) {
@@ -89,10 +88,11 @@ public class TokenValueMapFactory {
 	}
 
 	private String getNoValueErrorMsgFor(String line) {
-		return "No value for token: " + line + ". Make sure that tokens have values in pairs in the format: token=value";
+		return "No value for token: " + line + ". Make sure that " +
+				"tokens have values in pairs in the format: token=value";
 	}
 
 	private boolean ignoreFragment(String line, boolean commentsEnabled) {
-		return line.length() == 0 || commentsEnabled && line.startsWith(COMMENT_PREFIX);
+		return line.length() == 0 || (commentsEnabled && line.startsWith(COMMENT_PREFIX));
 	}
 }
