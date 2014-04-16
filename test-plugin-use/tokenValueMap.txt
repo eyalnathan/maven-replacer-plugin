@@ -1,0 +1,4 @@
+#test comment
+^test.*=value1
+
+token2=value2
