@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -21,7 +20,6 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Before;
@@ -66,7 +64,6 @@ public class ReplacerMojoIntegrationTest {
 				return log;
 			}
 		};
-		mojo.setBasedir(".");
 	}
 	
 	@Test
@@ -82,17 +79,6 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
-	public void shouldWarnOfMissingProperities() throws Exception {
-		String inputFile = createTempFile("test-filename-error", TOKEN);
-		mojo.setInputFilePattern("(.*)test-(.+)-error");
-		mojo.setOutputFilePattern("$1test-$2-error.replaced");
-		mojo.execute();
-		
-		assertFalse(new File(inputFile + ".replaced").exists());
-		verify(log).warn("No input file/s defined");
-	}
-	
-	@Test
 	public void shouldReplaceContentsInAbsolutePathedFile() throws Exception {
 		mojo.setFile(new File(filenameAndPath).getAbsolutePath());
 		mojo.setToken(TOKEN);
@@ -101,21 +87,6 @@ public class ReplacerMojoIntegrationTest {
 		
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
 		assertThat(results, equalTo(VALUE));
-		verify(log).info("Replacement run on 1 file.");
-	}
-	
-	@Test
-	public void shouldReplaceContentsMaintainingSpacesAndNewLines() throws Exception {
-		String valueWithSpacing = " new value" + System.getProperty("line.separator") + " replaced ";
-		mojo.setFile(filenameAndPath);
-		Replacement replacement = new Replacement();
-		replacement.setToken(TOKEN);
-		replacement.setValue(valueWithSpacing);
-		mojo.setReplacements(asList(replacement));
-		mojo.execute();
-		
-		String results = FileUtils.readFileToString(new File(filenameAndPath));
-		assertThat(results, equalTo(valueWithSpacing));
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
@@ -501,29 +472,7 @@ public class ReplacerMojoIntegrationTest {
 		String include2Results = FileUtils.readFileToString(new File(include2));
 		assertThat(include2Results, equalTo(VALUE));
 	}
-
-    @Test
-    public void shouldOnlyReplaceUpToMaxReplacements() throws Exception {
-        String randomBase = String.valueOf(RandomUtils.nextInt(10));
-        String include1 = createTempFile(randomBase + "/prefix1", TOKEN);
-        String include2 = createTempFile(randomBase + "/prefix2", TOKEN);
-        List<String> includes = asList("target/" + randomBase + "**/prefix*");
-
-        mojo.setPreserveDir(false);
-        mojo.setIncludes(includes);
-        mojo.setToken(TOKEN);
-        mojo.setMaxReplacements(1);
-        mojo.setValue(VALUE);
-        mojo.execute();
-
-        String include1Results = FileUtils.readFileToString(new File(include1));
-        String include2Results = FileUtils.readFileToString(new File(include2));
-        System.out.println(include1Results);
-        System.out.println(include2Results);
-        assertTrue((TOKEN.equals(include1Results) && VALUE.equals(include2Results))
-                || (VALUE.equals(include1Results) && TOKEN.equals(include2Results)));
-    }
-
+	
 	@Test
 	public void shouldReplaceContentsInIncludeButNotExcludesAndNotPreserveWhenDisabled() throws Exception {
 		String include1 = createTempFile("test/prefix1", TOKEN);
@@ -567,22 +516,6 @@ public class ReplacerMojoIntegrationTest {
 		assertThat(include2Results, equalTo(VALUE));
 		String excludeResults = FileUtils.readFileToString(new File(exclude));
 		assertThat(excludeResults, equalTo(TOKEN));
-	}
-	
-	@Test
-	public void shouldReplaceIncludesThatAreAbsolutePaths() throws Exception {
-		String include1 = createTempFile("test/prefix1", TOKEN);
-		String includeAsAbs = new File(include1).getParentFile().getParentFile().getAbsolutePath();
-		List<String> includes = asList(includeAsAbs + "/**/prefix*");
-
-		mojo.setBasedir("USE_ABSOLUTE_PATH");
-		mojo.setIncludes(includes);
-		mojo.setToken(TOKEN);
-		mojo.setValue(VALUE);
-		mojo.execute();
-		
-		String include1Results = FileUtils.readFileToString(new File(include1));
-		assertThat(include1Results, equalTo(VALUE));
 	}
 	
 	@Test

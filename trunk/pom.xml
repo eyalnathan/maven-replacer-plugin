@@ -4,7 +4,7 @@
 	<groupId>com.google.code.maven-replacer-plugin</groupId>
 	<artifactId>replacer</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>1.5.4-SNAPSHOT</version>
+	<version>1.5.2</version>
 	<url>http://code.google.com/p/maven-replacer-plugin</url>
 	<name>maven-replacer-plugin Maven Mojo</name>
 
@@ -18,9 +18,9 @@
 		Maven plugin to replace tokens in a given file with a value
 	</description>
 	<scm>
-		<url>https://maven-replacer-plugin.googlecode.com/svn/</url>
-		<connection>scm:svn:https://maven-replacer-plugin.googlecode.com/svn/</connection>
-		<developerConnection>scm:svn:https://maven-replacer-plugin.googlecode.com/svn/</developerConnection>
+		<url>https://maven-replacer-plugin.googlecode.com/svn/replacer-1.5.2</url>
+		<connection>scm:svn:https://maven-replacer-plugin.googlecode.com/svn/replacer-1.5.2</connection>
+		<developerConnection>scm:svn:https://maven-replacer-plugin.googlecode.com/svn/tags/replacer-1.5.2</developerConnection>
 	</scm>
 	<licenses>
 		<license>
@@ -28,7 +28,7 @@
 			<url>http://www.opensource.org/licenses/mit-license.php</url>
 			<distribution>repo</distribution>
 			<comments>
-Copyright (c) 2009-2014. Steven Baker - bakersemail@hotmail.com.
+Copyright (c) 2009-2012. Steven Baker - bakersemail@hotmail.com.
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -40,13 +40,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	<issueManagement>
 		<url>http://code.google.com/p/maven-replacer-plugin</url>
 	</issueManagement>
-	<distributionManagement>
-    		<repository>
-      			<id>sonatype-nexus-staging</id>
-      			<name>Nexus Staging Repository</name>
-     	 		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    		</repository>
-  	</distributionManagement>
 	<developers>
 		<developer>
 			<id>bakersemail@hotmail.com</id>
