@@ -116,48 +116,6 @@ public class ReplacerMojoTest {
 	}
 	
 	@Test
-	public void shouldSkipAndDoNothing() throws Exception {
-		mojo.setToken(TOKEN);
-		mojo.setValue(VALUE);
-		mojo.setFile(FILE);
-		mojo.setSkip(true);
-		mojo.execute();
-		
-		verifyZeroInteractions(processor);
-		verifyZeroInteractions(summaryBuilder);
-	}
-	
-	@Test
-	public void shouldIgnoreBaseDirWhenFileIsAbsolutePathed() throws Exception {
-		Replacement replacement = mock(Replacement.class);
-		List<Replacement> replacements = asList(replacement);
-
-		when(fileUtils.isAbsolutePath(FILE)).thenReturn(true);
-		mojo.setReplacements(replacements);
-		mojo.setFile(FILE);
-		mojo.execute();
-		verify(processor).replace(replacements, REGEX, FILE, OUTPUT_FILE, 0, null);
-		verify(summaryBuilder).add(FILE, OUTPUT_FILE, null, log);
-		verify(summaryBuilder).print(log);
-	}
-
-    @Test
-    public void shouldLimitReplacementsToMaxReplacements() throws Exception {
-        Replacement replacement1 = mock(Replacement.class);
-        Replacement replacement2 = mock(Replacement.class);
-        List<Replacement> replacements = asList(replacement1, replacement2);
-
-        when(fileUtils.isAbsolutePath(FILE)).thenReturn(true);
-        mojo.setReplacements(replacements);
-        mojo.setMaxReplacements(1);
-        mojo.setFile(FILE);
-        mojo.execute();
-        verify(processor).replace(asList(replacement1), REGEX, FILE, OUTPUT_FILE, 0, null);
-        verify(summaryBuilder).add(FILE, OUTPUT_FILE, null, log);
-        verify(summaryBuilder).print(log);
-    }
-
-	@Test
 	public void shouldReplaceContentsInLocalFile() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);

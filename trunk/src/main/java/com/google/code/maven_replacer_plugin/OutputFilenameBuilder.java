@@ -22,14 +22,12 @@ public class OutputFilenameBuilder {
 	}
 	
 	private String buildOutputFile(String inputFilename, ReplacerMojo mojo) {
-		String basedir = fileUtils.isAbsolutePath(inputFilename) ? "" : mojo.getBasedir();
-		
 		if (mojo.getOutputDir() != null && mojo.getOutputFile() != null) {
 			String cleanResult = mojo.isPreserveDir() ? mojo.getOutputFile() : stripPath(mojo.getOutputFile());
 			if (mojo.getOutputBasedir() != null) {
 				return fileUtils.createFullPath(mojo.getOutputBasedir(), mojo.getOutputDir(), cleanResult);
 			}
-			return fileUtils.createFullPath(basedir, mojo.getOutputDir(), cleanResult);
+			return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputDir(), cleanResult);
 		}
 		
 		if (mojo.getOutputDir() != null) {
@@ -37,7 +35,7 @@ public class OutputFilenameBuilder {
 			if (mojo.getOutputBasedir() != null) {
 				return fileUtils.createFullPath(mojo.getOutputBasedir(), mojo.getOutputDir(), cleanResult);
 			}
-			return fileUtils.createFullPath(basedir, mojo.getOutputDir(), cleanResult);
+			return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputDir(), cleanResult);
 		}
 		
 		if (mojo.getOutputFile() != null) {
@@ -45,9 +43,9 @@ public class OutputFilenameBuilder {
 			if (outFile.isAbsolute()) {
 				return fileUtils.createFullPath(mojo.getOutputFile());
 			}
-			return fileUtils.createFullPath(basedir, mojo.getOutputFile());
+			return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputFile());
 		}
-		return fileUtils.createFullPath(basedir, inputFilename);
+		return fileUtils.createFullPath(mojo.getBasedir(), inputFilename);
 	}
 
 	private String stripPath(String inputFilename) {
