@@ -22,7 +22,7 @@ public class TokenValueMapFactory {
 		this.fileUtils = fileUtils;
 	}
 	
-	public List<Replacement> replacementsForVariable(String variable, boolean commentsEnabled, boolean unescape, String encoding) {
+	public List<Replacement> replacementsForVariable(String variable, boolean commentsEnabled, boolean unescape) {
 		StringTokenizer tokenizer = new StringTokenizer(variable, ",");
 		String fragment = null;
 		List<Replacement> replacements = new ArrayList<Replacement>();
@@ -32,15 +32,14 @@ public class TokenValueMapFactory {
 				continue;
 			}
 
-			appendReplacement(replacements, fragment, unescape, encoding);
+			appendReplacement(replacements, fragment, unescape);
 		}
 		return replacements;
 	}
 
-	public List<Replacement> replacementsForFile(String tokenValueMapFile, boolean commentsEnabled, 
-			boolean unescape, String encoding) 
+	public List<Replacement> replacementsForFile(String tokenValueMapFile, boolean commentsEnabled, boolean unescape) 
 		throws IOException {
-		String contents = fileUtils.readFile(tokenValueMapFile, encoding);
+		String contents = fileUtils.readFile(tokenValueMapFile);
 		BufferedReader reader = new BufferedReader(new StringReader(contents));
 
 		String fragment = null;
@@ -51,12 +50,12 @@ public class TokenValueMapFactory {
 				continue;
 			}
 
-			appendReplacement(replacements, fragment, unescape, encoding);
+			appendReplacement(replacements, fragment, unescape);
 		}
 		return replacements;
 	}
 	
-	private void appendReplacement(List<Replacement> replacements, String fragment, boolean unescape, String encoding) {
+	private void appendReplacement(List<Replacement> replacements, String fragment, boolean unescape) {
 		StringBuilder token = new StringBuilder();
 		String value = "";
 		boolean settingToken = true;
@@ -76,12 +75,12 @@ public class TokenValueMapFactory {
 			}
 		}
 
-		if (settingToken) {
+		String tokenVal = token.toString().trim();
+		if (tokenVal.length() == 0 || settingToken) {
 			return;
 		}
-		
-		String tokenVal = token.toString().trim();
-		replacements.add(new Replacement(fileUtils, tokenVal, value.trim(), unescape, null, encoding));
+		value = value.trim();
+		replacements.add(new Replacement(fileUtils, tokenVal, value, unescape, null));
 	}
 
 	private boolean isSeparatorAt(int i, String line) {
@@ -93,6 +92,6 @@ public class TokenValueMapFactory {
 	}
 
 	private boolean ignoreFragment(String line, boolean commentsEnabled) {
-		return line.length() == 0 || commentsEnabled && line.startsWith(COMMENT_PREFIX);
+		return line.length() == 0 || (commentsEnabled && line.startsWith(COMMENT_PREFIX));
 	}
 }

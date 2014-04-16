@@ -25,10 +25,19 @@ public class TokenReplacer implements Replacer {
 	}
 
 	private String replaceNonRegex(String content, String token, String value) {
+		String valueToReplaceWith = defaultString(value);
 		if (isEmpty(content)) {
 			return content;
 		}
 
-		return content.replace(token, defaultString(value));
+		StringBuffer buffer = new StringBuffer();
+		int start = 0;
+		int end = 0;
+		while ((end = content.indexOf(token, start)) >= 0) {
+			buffer.append(content.substring(start, end));
+			buffer.append(valueToReplaceWith);
+			start = end + token.length();
+		}
+		return buffer.append(content.substring(start)).toString();
 	}
 }

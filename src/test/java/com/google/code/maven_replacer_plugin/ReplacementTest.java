@@ -21,7 +21,6 @@ public class ReplacementTest {
 	private static final String TOKEN = "token";
 	private static final String VALUE = "value";
 	private static final String XPATH = "xpath";
-	private static final String ENCODING = "encoding";
 	
 	@Mock
 	private FileUtils fileUtils;
@@ -30,7 +29,7 @@ public class ReplacementTest {
 
 	@Test
 	public void shouldReturnConstructorParameters() throws Exception {
-		Replacement replacement = new Replacement(fileUtils, TOKEN, VALUE, false, null, ENCODING);
+		Replacement replacement = new Replacement(fileUtils, TOKEN, VALUE, false, null);
 		
 		assertThat(replacement.getToken(), equalTo(TOKEN));
 		assertThat(replacement.getValue(), equalTo(VALUE));
@@ -40,7 +39,7 @@ public class ReplacementTest {
 	@Test
 	public void shouldApplyToTokenDelimeterIfExists() throws Exception {
 		when(delimiter.apply(TOKEN)).thenReturn("new token");
-		Replacement replacement = new Replacement(fileUtils, TOKEN, VALUE, false, null, ENCODING).withDelimiter(delimiter);
+		Replacement replacement = new Replacement(fileUtils, TOKEN, VALUE, false, null).withDelimiter(delimiter);
 		
 		assertThat(replacement.getToken(), equalTo("new token"));
 		assertThat(replacement.getValue(), equalTo(VALUE));
@@ -49,7 +48,7 @@ public class ReplacementTest {
 	
 	@Test
 	public void shouldUseEscapedTokensAndValues() {
-		Replacement replacement = new Replacement(fileUtils, UNESCAPED, UNESCAPED, true, null, ENCODING);
+		Replacement replacement = new Replacement(fileUtils, UNESCAPED, UNESCAPED, true, null);
 		
 		assertThat(replacement.getToken(), equalTo(ESCAPED));
 		assertThat(replacement.getValue(), equalTo(ESCAPED));
@@ -58,9 +57,9 @@ public class ReplacementTest {
 	
 	@Test
 	public void shouldUseEscapedTokensAndValuesFromFiles() throws Exception {
-		when(fileUtils.readFile(FILE, ENCODING)).thenReturn(UNESCAPED);
+		when(fileUtils.readFile(FILE)).thenReturn(UNESCAPED);
 
-		Replacement replacement = new Replacement(fileUtils, null, null, true, null, ENCODING);
+		Replacement replacement = new Replacement(fileUtils, null, null, true, null);
 		replacement.setTokenFile(FILE);
 		replacement.setValueFile(FILE);
 		
@@ -70,9 +69,9 @@ public class ReplacementTest {
 
 	@Test
 	public void shouldUseTokenFromFileUtilsIfGiven() throws Exception {
-		when(fileUtils.readFile(FILE, ENCODING)).thenReturn(TOKEN);
+		when(fileUtils.readFile(FILE)).thenReturn(TOKEN);
 
-		Replacement replacement = new Replacement(fileUtils, null, VALUE, false, null, ENCODING);
+		Replacement replacement = new Replacement(fileUtils, null, VALUE, false, null);
 		replacement.setTokenFile(FILE);
 		assertThat(replacement.getToken(), equalTo(TOKEN));
 		assertThat(replacement.getValue(), equalTo(VALUE));
@@ -80,9 +79,9 @@ public class ReplacementTest {
 
 	@Test
 	public void shouldUseValueFromFileUtilsIfGiven() throws Exception {
-		when(fileUtils.readFile(FILE, ENCODING)).thenReturn(VALUE);
+		when(fileUtils.readFile(FILE)).thenReturn(VALUE);
 
-		Replacement replacement = new Replacement(fileUtils, TOKEN, null, false, null, ENCODING);
+		Replacement replacement = new Replacement(fileUtils, TOKEN, null, false, null);
 		replacement.setValueFile(FILE);
 		assertThat(replacement.getToken(), equalTo(TOKEN));
 		assertThat(replacement.getValue(), equalTo(VALUE));
@@ -102,7 +101,7 @@ public class ReplacementTest {
 	
 	@Test
 	public void shouldReturnCopyOfReplacementInFrom() {
-		Replacement replacement = new Replacement(fileUtils, TOKEN, VALUE, true, XPATH, ENCODING);
+		Replacement replacement = new Replacement(fileUtils, TOKEN, VALUE, true, XPATH);
 		Replacement copy = Replacement.from(replacement);
 		
 		assertThat(copy.getToken(), equalTo(TOKEN));

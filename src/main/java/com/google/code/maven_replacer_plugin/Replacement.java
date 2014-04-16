@@ -14,7 +14,7 @@ public class Replacement {
 	private boolean unescape;
 	private String token;
 	private String value;
-	private String encoding;
+
 	private String xpath;
 	
 	public Replacement() {
@@ -22,25 +22,23 @@ public class Replacement {
 		this.unescape = false;
 	}
 
-	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape,
-			String xpath, String encoding) {
+	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape, String xpath) {
 		this.fileUtils = fileUtils;
 		setUnescape(unescape);
 		setToken(token);
 		setValue(value);
 		setXpath(xpath);
-		setEncoding(encoding);
 	}
 
 	public void setTokenFile(String tokenFile) throws IOException {
 		if (tokenFile != null) {
-			setToken(fileUtils.readFile(tokenFile, getEncoding()));
+			setToken(fileUtils.readFile(tokenFile));
 		}
 	}
 
 	public void setValueFile(String valueFile) throws IOException {
 		if (valueFile != null) {
-			setValue(fileUtils.readFile(valueFile, getEncoding()));
+			setValue(fileUtils.readFile(valueFile));
 		}
 	}
 
@@ -55,7 +53,7 @@ public class Replacement {
 	public String getValue() {
 		return unescape ? unescape(value) : value;
 	}
-
+	
 	public void setToken(String token) {
 		this.token = token;
 	}
@@ -77,8 +75,8 @@ public class Replacement {
 	}
 
 	public static Replacement from(Replacement replacement) {
-		return new Replacement(replacement.fileUtils, replacement.token, replacement.value,
-				replacement.unescape, replacement.xpath, replacement.encoding);
+		return new Replacement(replacement.fileUtils, replacement.token, replacement.value, 
+				replacement.unescape, replacement.xpath);
 	}
 
 	public Replacement withDelimiter(DelimiterBuilder delimiter) {
@@ -89,16 +87,8 @@ public class Replacement {
 	public void setXpath(String xpath) {
 		this.xpath = xpath;
 	}
-
+	
 	public String getXpath() {
 		return xpath;
-	}
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	public String getEncoding() {
-		return encoding;
 	}
 }

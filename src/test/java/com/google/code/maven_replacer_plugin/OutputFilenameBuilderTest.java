@@ -1,9 +1,7 @@
 package com.google.code.maven_replacer_plugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,11 +13,10 @@ import org.junit.Test;
 import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 public class OutputFilenameBuilderTest {
-	private static final String INPUT_FILE = "parent" + File.separator + "input";
+	private static final String INPUT_FILE = "parent/input";
 	private static final String BASE_DIR = ".";
-	private static final String OUTPUT_DIR = "target" + File.separator + "out";
+	private static final String OUTPUT_DIR = "target/out";
 	private static final String OUTPUT_FILE = "outputFile";
-	private static final String OUTPUT_FILE_WITH_PARENT = "parent" + File.separator + OUTPUT_FILE;
 	private static final String OUTPUT_BASE_DIR = "outputBaseDir";
 	
 	private OutputFilenameBuilder builder;
@@ -33,21 +30,6 @@ public class OutputFilenameBuilderTest {
 		
 		fileUtils = new FileUtils();
 		builder = new OutputFilenameBuilder();
-	}
-	
-	@Test
-	public void shouldReturnFullPathWithAllOutputFileParams() {
-		when(mojo.getOutputDir()).thenReturn(OUTPUT_DIR);
-		when(mojo.getOutputBasedir()).thenReturn(OUTPUT_BASE_DIR);
-		when(mojo.getOutputFile()).thenReturn(OUTPUT_FILE_WITH_PARENT);
-		when(mojo.isPreserveDir()).thenReturn(true);
-		
-		String output = builder.buildFrom(INPUT_FILE, mojo);
-		assertThat(output, equalTo(fileUtils.createFullPath(OUTPUT_BASE_DIR, OUTPUT_DIR, OUTPUT_FILE_WITH_PARENT)));
-		
-		when(mojo.isPreserveDir()).thenReturn(false);
-		output = builder.buildFrom(INPUT_FILE, mojo);
-		assertThat(output, equalTo(fileUtils.createFullPath(OUTPUT_BASE_DIR, OUTPUT_DIR, OUTPUT_FILE)));
 	}
 	
 	@Test
@@ -66,45 +48,6 @@ public class OutputFilenameBuilderTest {
 		
 		String output = builder.buildFrom(INPUT_FILE, mojo);
 		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, OUTPUT_DIR, INPUT_FILE)));
-	}
-	
-	@Test
-	public void shouldPrefixOutputDirWhenUsingOutputDirAndOutputFile() {
-		when(mojo.getOutputDir()).thenReturn(OUTPUT_DIR);
-		when(mojo.getOutputFile()).thenReturn(OUTPUT_FILE);
-		
-		String output = builder.buildFrom(INPUT_FILE, mojo);
-		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, OUTPUT_DIR, OUTPUT_FILE)));
-	}
-	
-	@Test
-	public void shouldReturnReplacedOutputFilenameFromPatterns() {
-		when(mojo.getInputFilePattern()).thenReturn("(.+)");
-		when(mojo.getOutputFilePattern()).thenReturn("$1");
-		
-		String output = builder.buildFrom(INPUT_FILE, mojo);
-		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, INPUT_FILE)));
-		
-		when(mojo.getInputFilePattern()).thenReturn("(.+)");
-		when(mojo.getOutputFilePattern()).thenReturn("$1-new");
-		
-		output = builder.buildFrom(INPUT_FILE, mojo);
-		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, INPUT_FILE + "-new")));
-	}
-	
-	@Test
-	public void shouldNotReturnReplacedOutputFilenameWhenMissingEitherInputOrOutputPattern() {
-		when(mojo.getInputFilePattern()).thenReturn(null);
-		when(mojo.getOutputFilePattern()).thenReturn("$1-new");
-		
-		String output = builder.buildFrom(INPUT_FILE, mojo);
-		assertThat(output, not(endsWith("-new")));
-		
-		when(mojo.getInputFilePattern()).thenReturn("(.+)");
-		when(mojo.getOutputFilePattern()).thenReturn(null);
-		
-		output = builder.buildFrom(INPUT_FILE, mojo);
-		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, INPUT_FILE)));
 	}
 	
 	@Test
