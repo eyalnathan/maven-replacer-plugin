@@ -1,0 +1,6 @@
+
+
+
+some @token@ with another #{token} to replace
+
+and escaped maven property ${token}

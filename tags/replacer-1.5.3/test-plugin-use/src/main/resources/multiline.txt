@@ -1,0 +1,5 @@
+some
+<!--removedByBuildStart-->
+ This is text I want to replace....
+<!--removedByBuildEnd-->
+to replace

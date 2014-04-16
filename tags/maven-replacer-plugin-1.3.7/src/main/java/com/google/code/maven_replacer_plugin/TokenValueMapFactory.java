@@ -1,0 +1,98 @@
+package com.google.code.maven_replacer_plugin;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import com.google.code.maven_replacer_plugin.file.FileUtils;
+
+
+public class TokenValueMapFactory {
+
+	private static final char SEPARATOR_ESCAPER = '\\';
+	private static final char SEPARATOR = '=';
+	private static final String COMMENT_PREFIX = "#";
+
+	private final FileUtils fileUtils;
+
+	public TokenValueMapFactory(FileUtils fileUtils) {
+		this.fileUtils = fileUtils;
+	}
+	
+	public List<Replacement> contextsForVariable(String variable, boolean commentsEnabled, boolean unescape) {
+		StringTokenizer tokenizer = new StringTokenizer(variable, ",");
+		String fragment = null;
+		List<Replacement> contexts = new ArrayList<Replacement>();
+		while (tokenizer.hasMoreTokens()) {
+			fragment = tokenizer.nextToken();
+			if (ignoreFragment(fragment, commentsEnabled)) {
+				continue;
+			}
+
+			appendContext(contexts, fragment, unescape);
+		}
+		return contexts;
+	}
+
+	public List<Replacement> contextsForFile(String tokenValueMapFile, boolean commentsEnabled, boolean unescape) 
+		throws IOException {
+		String contents = fileUtils.readFile(tokenValueMapFile);
+		BufferedReader reader = new BufferedReader(new StringReader(contents));
+
+		String fragment = null;
+		List<Replacement> contexts = new ArrayList<Replacement>();
+		while ((fragment = reader.readLine()) != null) {
+			fragment = fragment.trim();
+			if (ignoreFragment(fragment, commentsEnabled)) {
+				continue;
+			}
+
+			appendContext(contexts, fragment, unescape);
+		}
+		return contexts;
+	}
+	
+	private void appendContext(List<Replacement> contexts, String fragment, boolean unescape) {
+		StringBuilder token = new StringBuilder();
+		String value = "";
+		boolean settingToken = true;
+		for (int i=0; i < fragment.length(); i++) {
+			if (i == 0 && fragment.charAt(0) == SEPARATOR) {
+				throw new IllegalArgumentException(getNoValueErrorMsgFor(fragment) + "1");
+			}
+
+			if (settingToken && !isSeparatorAt(i, fragment)) {
+				token.append(fragment.charAt(i));
+			} else if (isSeparatorAt(i, fragment)) {
+				settingToken = false;
+				continue;
+			} else {
+				value = fragment.substring(i);
+				break;
+			}
+		}
+
+		String tokenVal = token.toString().trim();
+		if (tokenVal.length() == 0 || settingToken) {
+			return;
+		}
+		value = value.trim();
+		contexts.add(new Replacement(fileUtils, tokenVal, value, unescape));
+	}
+
+	private boolean isSeparatorAt(int i, String line) {
+		return line.charAt(i) == SEPARATOR && line.charAt(i - 1) != SEPARATOR_ESCAPER;
+	}
+
+	private String getNoValueErrorMsgFor(String line) {
+		return "No value for token: " + line + ". Make sure that " +
+				"tokens have values in pairs in the format: token=value";
+	}
+
+	private boolean ignoreFragment(String line, boolean commentsEnabled) {
+		return line.length() == 0 || (commentsEnabled && line.startsWith(COMMENT_PREFIX));
+	}
+}
