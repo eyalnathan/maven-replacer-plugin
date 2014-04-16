@@ -1,9 +1,6 @@
 package com.google.code.maven_replacer_plugin;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 
 import java.util.regex.Pattern;
 
@@ -13,81 +10,61 @@ import org.junit.Test;
 public class TokenReplacerTest {
 	private static final int NO_FLAGS = -1;
 	
-	private Replacement replacement;
 	private TokenReplacer replacer;
 
 	@Before
 	public void setUp() {
-		replacement = mock(Replacement.class);
-		when(replacement.getToken()).thenReturn("t.k.n");
-		when(replacement.getValue()).thenReturn("value");
 		replacer = new TokenReplacer();
 	}
 
 	@Test
 	public void shouldReplaceNonRegexTokenWithValue() throws Exception {
-		when(replacement.getToken()).thenReturn("$token$");
-		String results = replacer.replace("some $token$", replacement, false, NO_FLAGS);
-		assertThat(results, equalTo("some value"));
+		String results = replacer.replaceNonRegex("some $token$", "$token$", "value");
+		assertEquals("some value", results);
 	}
 
 	@Test
 	public void shouldReplaceRegexTokenWithValue() throws Exception {
-		String results = replacer.replace("some token", replacement, true, NO_FLAGS);
-		assertThat(results, equalTo("some value"));
+		String results = replacer.replaceRegex("some token", "t.k.n", "value", NO_FLAGS);
+		assertEquals("some value", results);
 	}
 
 	@Test
 	public void shouldReplaceTokenWithEmptyValue() throws Exception {
-		when(replacement.getValue()).thenReturn(null);
-		String results = replacer.replace("some token", replacement, true, NO_FLAGS);
-		assertThat(results, equalTo("some "));
+		String results = replacer.replaceRegex("some token", "t.k.n", null, NO_FLAGS);
+		assertEquals("some ", results);
 	}
 
 	@Test
 	public void shouldReplaceTokenInMulipleLines() throws Exception {
-		when(replacement.getValue()).thenReturn(null);
-		String results = replacer.replace("some\ntoken", replacement, true, NO_FLAGS);
-		assertThat(results, equalTo("some\n"));
+		String results = replacer.replaceRegex("some\ntoken", "t.k.n", null, NO_FLAGS);
+		assertEquals("some\n", results);
 	}
 	
 	@Test
 	public void shouldReplaceTokenOnCompleteLine() throws Exception {
-		when(replacement.getToken()).thenReturn("^replace=.*$");
-		when(replacement.getValue()).thenReturn("replace=value");
-		String results = replacer.replace("some\nreplace=token\nnext line", replacement, true, Pattern.MULTILINE);
-		assertThat(results, equalTo("some\nreplace=value\nnext line"));
+		String results = replacer.replaceRegex("some\nreplace=token\nnext line", "^replace=.*$", "replace=value", Pattern.MULTILINE);
+		assertEquals("some\nreplace=value\nnext line", results);
 	}
 	
 	@Test
 	public void shouldReplaceTokenWithCaseInsensitivity() throws Exception {
-		when(replacement.getToken()).thenReturn("TEST");
-		String results = replacer.replace("test", replacement, true, Pattern.CASE_INSENSITIVE);
-		assertThat(results, equalTo("value"));
+		String results = replacer.replaceRegex("test", "TEST", "value", Pattern.CASE_INSENSITIVE);
+		assertEquals("value", results);
 	}
 
 	@Test
 	public void shouldHandleEmptyContentsGracefully() {
-		String results = replacer.replace("", replacement, true, NO_FLAGS);
-		assertThat(results, equalTo(""));
+		String results = replacer.replaceRegex("", "anything", "anything", NO_FLAGS);
+		assertEquals("", results);
 
-		results = replacer.replace("", replacement, false, NO_FLAGS);
-		assertThat(results, equalTo(""));
+		results = replacer.replaceNonRegex("", "anything", "anything");
+		assertEquals("", results);
 	}
 	
 	@Test
 	public void shouldHandleEmptyValueForNonRegex() throws Exception {
-		when(replacement.getToken()).thenReturn("token");
-		when(replacement.getValue()).thenReturn(null);
-		String results = replacer.replace("some token", replacement, false, NO_FLAGS);
-		assertThat(results, equalTo("some "));
-	}
-	
-	@Test
-	public void shouldReplaceWithGroups() throws Exception {
-		when(replacement.getToken()).thenReturn("test (.*) number");
-		when(replacement.getValue()).thenReturn("group $1 replaced");
-		String results = replacer.replace("test 123 number", replacement, true, NO_FLAGS);
-		assertThat(results, equalTo("group 123 replaced"));
+		String results = replacer.replaceNonRegex("some token", "token", null);
+		assertEquals("some ", results);
 	}
 }
