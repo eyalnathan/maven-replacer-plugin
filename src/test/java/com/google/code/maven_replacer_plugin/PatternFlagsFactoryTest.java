@@ -1,8 +1,7 @@
 package com.google.code.maven_replacer_plugin;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import com.google.code.maven_replacer_plugin.PatternFlagsFactory;
 
 @RunWith(Parameterized.class)
 public class PatternFlagsFactoryTest {
@@ -50,7 +51,7 @@ public class PatternFlagsFactoryTest {
 
 	@Test
 	public void shouldReturnBitValueForFlags() throws Exception {
-		assertThat(factory.buildFlags(inputFlags), is(expectedFlags));
+		assertEquals(expectedFlags, factory.buildFlags(inputFlags));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
